@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import CompanyInformation from '../components/CompanyInformation'
 import SubscriptionModal from '../components/SubscriptionModal'
+import DynamicAd from '../components/DynamicAd'; // adjust the path if needed
 
 type FileState = { name: string; size: string } | null
 
@@ -617,6 +618,15 @@ export default function Page() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubscribe={handleSubscribe}
+      />
+      <DynamicAd
+        image="/whatsapp.png"
+        alt="WhatsApp API by Axora Web Solutions"
+        href="https://waapi.axorawebsolutions.com"
+        label="Sponsored"
+        title="WhatsApp API"
+        description="Automate WhatsApp messaging for your business."
+        ctaText="Learn more"
       />
     </main>
   )
