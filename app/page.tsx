@@ -154,17 +154,26 @@ export default function Page() {
 
   return (
     <main className="site-shell">
-      <header className="site-header">
-        <div className="brand">
-          <span className="brand-mark">A</span>
-          <span>
-            AXORA <b>WEB SOLUTIONS</b>
-          </span>
-        </div>
-        <span className="help-link">
-          Need Help? <a href="mailto:hello@axorawebsolutions.com">Contact us</a>
-        </span>
-      </header>
+
+<header className="site-header mx-auto flex w-[96%] max-w-[1400px] items-center justify-between px-7 py-5">
+  <div className="brand lg:-ml-20">
+    <img
+      src="/logo.png"
+      alt="Axora Web Solutions"
+      className="h-auto w-[190px] object-contain"
+    />
+  </div>
+
+  <span className="help-link text-sm">
+    Need Help?{" "}
+    <a
+      href="mailto:hello@axorawebsolutions.com"
+      className="font-medium hover:underline"
+    >
+      Contact us
+    </a>
+  </span>
+</header>
 
       <section className="application-intro">
         <span className="eyebrow">APPLICATION</span>
@@ -380,7 +389,7 @@ export default function Page() {
                 ) : (
                   <>
                     <strong>
-                      ₨500 <small>one-time</small>
+                      ₨ 250<small>one-time</small>
                     </strong>
                     <button type="button" onClick={() => setBoostOpen(true)}>
                       Boost my CV <ArrowRight />

@@ -247,7 +247,7 @@ export default function SubscriptionModal({
                   </span>
                   <div className="mt-1 flex items-baseline gap-1.5">
                     <strong className="text-2xl font-bold text-slate-900">
-                      ₨ 500
+                      ₨ 250
                     </strong>
                     <span className="text-sm text-slate-500">/ month</span>
                   </div>
