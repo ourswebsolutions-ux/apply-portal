@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, FormEvent, useRef, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   Check,
@@ -18,9 +18,25 @@ import {
 } from 'lucide-react'
 import CompanyInformation from '../components/CompanyInformation'
 import SubscriptionModal from '../components/SubscriptionModal'
+
 type FileState = { name: string; size: string } | null
 
 const initialSkills = ['React', 'Next.js', 'Node.js', 'TypeScript']
+
+/** Converts URL hash slug → human-readable job title */
+function getJobTitleFromHash() {
+  const slug = window.location.hash.replace(/^#/, '').trim()
+
+  if (!slug) {
+    return 'Senior Full Stack Developer'
+  }
+
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
 
 function Field({
   label,
@@ -66,6 +82,10 @@ function SectionHeading({
   )
 }
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
+
 export default function Page() {
   const fileInput = useRef<HTMLInputElement>(null)
   const [skills, setSkills] = useState(initialSkills)
@@ -80,6 +100,58 @@ export default function Page() {
   const [modalOpen, setModalOpen] = useState(false)
   const [unlocked, setUnlocked] = useState(false)
 
+  // Dynamic job title from URL hash
+  const [jobTitle, setJobTitle] = useState('Senior Full Stack Developer')
+
+  // Premium email access
+  const [email, setEmail] = useState('')
+  const [paidAccess, setPaidAccess] = useState(false)
+  const [checkingEmail, setCheckingEmail] = useState(false)
+  const [emailCheckError, setEmailCheckError] = useState(false)
+
+  const hasPremiumAccess = paidAccess || boostRequested
+
+  // Keep job title in sync with the URL hash (including live changes)
+  useEffect(() => {
+    const updateTitle = () => setJobTitle(getJobTitleFromHash())
+    updateTitle() // initial read
+
+    window.addEventListener('hashchange', updateTitle)
+    return () => window.removeEventListener('hashchange', updateTitle)
+  }, [])
+
+  // Debounced paid-access check
+  useEffect(() => {
+    // Reset immediately when email changes
+    setPaidAccess(false)
+    setEmailCheckError(false)
+
+    const trimmed = email.trim().toLowerCase()
+    if (!trimmed || !isValidEmail(trimmed)) {
+      setCheckingEmail(false)
+      return
+    }
+
+    setCheckingEmail(true)
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/paid-access?email=${encodeURIComponent(trimmed)}`
+        )
+        if (!res.ok) throw new Error('check failed')
+        const data = await res.json()
+        setPaidAccess(!!data.paid)
+        setEmailCheckError(false)
+      } catch {
+        setPaidAccess(false)
+        setEmailCheckError(true)
+      } finally {
+        setCheckingEmail(false)
+      }
+    }, 600)
+
+    return () => clearTimeout(timer)
+  }, [email])
 
   const handleSubscribe = () => {
     setUnlocked(true)
@@ -94,7 +166,10 @@ export default function Page() {
       return
     }
     setError('')
-    setFile({ name: selected.name, size: `${(selected.size / (1024 * 1024)).toFixed(1)} MB` })
+    setFile({
+      name: selected.name,
+      size: `${(selected.size / (1024 * 1024)).toFixed(1)} MB`,
+    })
   }
 
   const addSkill = () => {
@@ -106,7 +181,8 @@ export default function Page() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     if (!file) return setError('Please upload your CV before submitting.')
-    if (!consent) return setError('Please confirm that the information provided is accurate.')
+    if (!consent)
+      return setError('Please confirm that the information provided is accurate.')
     setError('')
     setLoading(true)
     setTimeout(() => {
@@ -127,7 +203,7 @@ export default function Page() {
             </span>
           </div>
           <span className="help-link">
-            Need Help? <a href="mailto:hello@axorawebsolutions.com">Contact us</a>
+            Need Help? <a href="mailto:info.axoraweb@gmail.com">Contact us</a>
           </span>
         </header>
         <section className="success-card" aria-live="polite">
@@ -137,13 +213,13 @@ export default function Page() {
           <span className="eyebrow">APPLICATION RECEIVED</span>
           <h1>Application submitted</h1>
           <p>
-            Your application has been successfully received and will be reviewed by our recruitment
-            team.
+            Your application has been successfully received and will be reviewed
+            by our recruitment team.
           </p>
           <div className="success-details">
             <div>
               <span>POSITION</span>
-              <strong>Senior Full Stack Developer</strong>
+              <strong>{jobTitle}</strong>
             </div>
             <div>
               <span>APPLICATION REFERENCE</span>
@@ -151,7 +227,8 @@ export default function Page() {
             </div>
           </div>
           <div className="success-status">
-            <CheckCircle2 /> {boostRequested ? 'CV Boost Requested' : 'Application Submitted'}
+            <CheckCircle2 />{' '}
+            {hasPremiumAccess ? 'CV Boost Requested' : 'Application Submitted'}
           </div>
           <p className="thank-you">Thank you for your interest in Axora.</p>
         </section>
@@ -162,42 +239,43 @@ export default function Page() {
 
   return (
     <main className="site-shell">
+      <header className="site-header mx-auto flex w-[96%] max-w-[1400px] items-center justify-between px-7 py-5">
+        <div className="brand lg:-ml-20">
+          <img
+            src="/logo.png"
+            alt="Axora Web Solutions"
+            className="h-auto w-[190px] object-contain"
+          />
+        </div>
 
-<header className="site-header mx-auto flex w-[96%] max-w-[1400px] items-center justify-between px-7 py-5">
-  <div className="brand lg:-ml-20">
-    <img
-      src="/logo.png"
-      alt="Axora Web Solutions"
-      className="h-auto w-[190px] object-contain"
-    />
-  </div>
-
-  <span className="help-link text-sm">
-    Need Help?{" "}
-    <a
-      href="mailto:hello@axorawebsolutions.com"
-      className="font-medium hover:underline"
-    >
-      Contact us
-    </a>
-  </span>
-</header>
+        <span className="help-link text-sm">
+          Need Help?{' '}
+          <a
+            href="mailto:hello@axorawebsolutions.com"
+            className="font-medium hover:underline"
+          >
+            Contact us
+          </a>
+        </span>
+      </header>
 
       <section className="application-intro">
         <span className="eyebrow">APPLICATION</span>
         <h1>
           Apply for the <span>position</span>
         </h1>
-        <p>Complete the form below and submit your CV to apply for this opportunity.</p>
+        <p>
+          Complete the form below and submit your CV to apply for this
+          opportunity.
+        </p>
         <div className="position-pill">
-          <span className="position-dot" /> <strong>Senior Full Stack Developer</strong>
+          <span className="position-dot" />{' '}
+          <strong>{jobTitle}</strong>
           <i /> <span>Remote · Full-time</span>
         </div>
       </section>
 
-      {/* Two-column premium layout */}
       <div className="application-layout">
-        {/* LEFT — Existing form (unchanged) */}
         <div className="form-column">
           <form className="application-card" onSubmit={submit}>
             <div className="form-section">
@@ -206,23 +284,61 @@ export default function Page() {
                 <Field label="Full Name" required>
                   <input name="name" placeholder="John Doe" autoComplete="name" />
                 </Field>
+
                 <Field label="Email Address" required>
                   <div className="input-icon">
                     <Mail />
-                    <input name="email" type="email" placeholder="john@example.com" autoComplete="email" />
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="john@example.com"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
                   </div>
+                  {/* Subtle status under the email field */}
+                  {checkingEmail && (
+                    <span className="field-hint" style={{ marginTop: 6 }}>
+                      Checking premium access…
+                    </span>
+                  )}
+                  {!checkingEmail && paidAccess && (
+                    <span
+                      className="field-hint"
+                      style={{ marginTop: 6, color: 'var(--success, #16a34a)' }}
+                    >
+                      ✓ Premium access verified
+                    </span>
+                  )}
+                  {!checkingEmail && emailCheckError && (
+                    <span className="field-hint" style={{ marginTop: 6 }}>
+                      Unable to verify premium access right now.
+                    </span>
+                  )}
                 </Field>
+
                 <Field label="Phone / WhatsApp" required>
-                  <input name="phone" placeholder="+92 3XX XXXXXXX" autoComplete="tel" />
+                  <input
+                    name="phone"
+                    placeholder="+92 3XX XXXXXXX"
+                    autoComplete="tel"
+                  />
                 </Field>
                 <Field label="Country" required>
                   <div className="input-icon">
                     <MapPin />
-                    <input name="country" placeholder="Pakistan" autoComplete="country-name" />
+                    <input
+                      name="country"
+                      placeholder="Pakistan"
+                      autoComplete="country-name"
+                    />
                   </div>
                 </Field>
               </div>
             </div>
+
+            {/* … sections 02, 03, 04 remain exactly as you had them … */}
 
             <div className="form-section">
               <SectionHeading number="02" title="Professional information" />
@@ -244,14 +360,19 @@ export default function Page() {
                     <ChevronDown />
                   </div>
                 </Field>
-                <Field label="Primary Skills" hint="Add the skills most relevant to this opportunity.">
+                <Field
+                  label="Primary Skills"
+                  hint="Add the skills most relevant to this opportunity."
+                >
                   <div className="tag-input">
                     {skills.map((skill) => (
                       <span className="skill-tag" key={skill}>
                         {skill}
                         <button
                           type="button"
-                          onClick={() => setSkills(skills.filter((item) => item !== skill))}
+                          onClick={() =>
+                            setSkills(skills.filter((item) => item !== skill))
+                          }
                           aria-label={`Remove ${skill}`}
                         >
                           <X />
@@ -270,7 +391,12 @@ export default function Page() {
                       onBlur={addSkill}
                       placeholder="Add a skill"
                     />
-                    <button className="add-skill" type="button" onClick={addSkill} aria-label="Add skill">
+                    <button
+                      className="add-skill"
+                      type="button"
+                      onClick={addSkill}
+                      aria-label="Add skill"
+                    >
                       <Plus />
                     </button>
                   </div>
@@ -336,7 +462,11 @@ export default function Page() {
                       </b>
                     </span>
                   </div>
-                  <button type="button" onClick={() => setFile(null)} className="remove-file">
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    className="remove-file"
+                  >
                     Remove
                   </button>
                 </div>
@@ -366,31 +496,64 @@ export default function Page() {
               </div>
             </div>
 
-            <div className={`boost-card ${boostRequested ? 'boost-selected' : ''}`}>
+            {/* BOOST CARD — visual structure unchanged, content switches on paidAccess */}
+            <div
+              className={`boost-card ${
+                hasPremiumAccess ? 'boost-selected' : ''
+              }`}
+            >
               <div className="boost-icon">
                 <Rocket />
               </div>
               <div className="boost-copy">
-                <span className="boost-label">OPTIONAL PREMIUM SERVICE</span>
-                <h2>Make your CV stand out</h2>
-                <p>Get your CV reviewed and optimized specifically for this opportunity.</p>
-                <ul>
-                  <li>
-                    <Check /> Skills
-                  </li>
-                  <li>
-                    <Check /> Experience
-                  </li>
-                  <li>
-                    <Check /> Achievements
-                  </li>
-                  <li>
-                    <Check /> Professional strengths
-                  </li>
-                </ul>
+                {paidAccess ? (
+                  <>
+                    <span className="boost-label">PREMIUM ACCESS ACTIVE</span>
+                    <h2>Your premium access is already enabled for this email.</h2>
+                    <p>
+                      CV Boost is included. No additional payment is required.
+                    </p>
+                    <ul>
+                      <li>
+                        <Check /> CV Boost included
+                      </li>
+                      <li>
+                        <Check /> No additional payment required
+                      </li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <span className="boost-label">OPTIONAL PREMIUM SERVICE</span>
+                    <h2>Make your CV stand out</h2>
+                    <p>
+                      Get your CV reviewed and optimized specifically for this
+                      opportunity.
+                    </p>
+                    <ul>
+                      <li>
+                        <Check /> Skills
+                      </li>
+                      <li>
+                        <Check /> Experience
+                      </li>
+                      <li>
+                        <Check /> Achievements
+                      </li>
+                      <li>
+                        <Check /> Professional strengths
+                      </li>
+                    </ul>
+                  </>
+                )}
               </div>
+
               <div className="boost-action">
-                {boostRequested ? (
+                {paidAccess ? (
+                  <div className="requested">
+                    <CheckCircle2 /> Premium access verified
+                  </div>
+                ) : boostRequested ? (
                   <div className="requested">
                     <CheckCircle2 /> Boost requested
                   </div>
@@ -424,7 +587,9 @@ export default function Page() {
                 <span className="check-box">
                   <Check />
                 </span>
-                <span>I confirm that the information provided is accurate.</span>
+                <span>
+                  I confirm that the information provided is accurate.
+                </span>
               </label>
               <button className="submit-button" type="submit" disabled={loading}>
                 {loading ? (
@@ -440,19 +605,19 @@ export default function Page() {
           </form>
         </div>
 
-        {/* RIGHT — New Company Information card */}
+        {/* RIGHT column */}
         <div className="company-column">
-          <CompanyInformation />
+          <CompanyInformation unlocked={paidAccess} />
         </div>
       </div>
 
       <Footer />
 
       <SubscriptionModal
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-              onSubscribe={handleSubscribe}
-            />
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubscribe={handleSubscribe}
+      />
     </main>
   )
 }

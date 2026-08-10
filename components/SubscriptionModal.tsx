@@ -39,6 +39,7 @@ export default function SubscriptionModal({
   })
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [showSuccess, setShowSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   if (!open) return null
 
@@ -74,9 +75,37 @@ export default function SubscriptionModal({
     setStep((prev) => Math.max(1, prev - 1))
   }
 
-  const handlePaymentCompleteClick = () => {
+  const handlePaymentCompleteClick = async () => {
+  try {
+    setLoading(true)
+
+    const res = await fetch('/api/payment-submission', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        amount: 250,
+      }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to submit payment')
+    }
+
     setShowSuccess(true)
+  } catch (error) {
+    console.error(error)
+    alert('Unable to submit payment. Please try again.')
+  } finally {
+    setLoading(false)
   }
+}
 
   const updateField = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -134,12 +163,12 @@ export default function SubscriptionModal({
               </p>
             </div>
 
-            <p className="mb-6 text-xs text-slate-500">
+            <p className="mb-6 text-xs text-slate-250">
               You will receive a confirmation once your premium access is live.
             </p>
 
             <button
-              className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-250 focus:ring-offset-2"
               onClick={resetAndClose}
             >
               Got it
@@ -148,7 +177,7 @@ export default function SubscriptionModal({
         ) : (
           <>
             {/* Step Indicator */}
-            <div className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <div className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-250">
               <span
                 className={`flex items-center gap-1.5 ${
                   step === 1 ? 'font-semibold text-indigo-600' : ''
@@ -233,7 +262,7 @@ export default function SubscriptionModal({
                     >
                       <Check
                         size={16}
-                        className="shrink-0 text-emerald-500"
+                        className="shrink-0 text-emerald-250"
                         strokeWidth={2.5}
                       />
                       {item}
@@ -242,28 +271,28 @@ export default function SubscriptionModal({
                 </ul>
 
                 <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                  <span className="text-xs font-medium text-slate-500">
+                  <span className="text-xs font-medium text-slate-250">
                     Subscription
                   </span>
                   <div className="mt-1 flex items-baseline gap-1.5">
                     <strong className="text-2xl font-bold text-slate-900">
                       ₨ 250
                     </strong>
-                    <span className="text-sm text-slate-500">/ month</span>
+                    <span className="text-sm text-slate-250">/ month</span>
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-250">
                     Cancel anytime · Instant access after subscribe
                   </p>
                 </div>
 
                 <button
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-250 focus:ring-offset-2"
                   onClick={handleContinueFromStep1}
                 >
                   Continue to Payment <ArrowRight size={16} />
                 </button>
                 <button
-                  className="mt-3 w-full py-2 text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                  className="mt-3 w-full py-2 text-sm font-medium text-slate-250 transition hover:text-slate-700"
                   onClick={resetAndClose}
                 >
                   Maybe Later
@@ -302,14 +331,14 @@ export default function SubscriptionModal({
                       placeholder="Enter your full name"
                       value={formData.fullName}
                       onChange={(e) => updateField('fullName', e.target.value)}
-                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-250/20 ${
                         errors.fullName
                           ? 'border-red-400 focus:border-red-400'
-                          : 'border-slate-200 focus:border-indigo-500'
+                          : 'border-slate-200 focus:border-indigo-250'
                       }`}
                     />
                     {errors.fullName && (
-                      <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
+                      <p className="mt-1 text-xs text-red-250">{errors.fullName}</p>
                     )}
                   </div>
 
@@ -327,14 +356,14 @@ export default function SubscriptionModal({
                       placeholder="you@example.com"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
-                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-250/20 ${
                         errors.email
                           ? 'border-red-400 focus:border-red-400'
-                          : 'border-slate-200 focus:border-indigo-500'
+                          : 'border-slate-200 focus:border-indigo-250'
                       }`}
                     />
                     {errors.email && (
-                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                      <p className="mt-1 text-xs text-red-250">{errors.email}</p>
                     )}
                   </div>
 
@@ -352,14 +381,14 @@ export default function SubscriptionModal({
                       placeholder="+92 3XX XXXXXXX"
                       value={formData.phone}
                       onChange={(e) => updateField('phone', e.target.value)}
-                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-250/20 ${
                         errors.phone
                           ? 'border-red-400 focus:border-red-400'
-                          : 'border-slate-200 focus:border-indigo-500'
+                          : 'border-slate-200 focus:border-indigo-250'
                       }`}
                     />
                     {errors.phone && (
-                      <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                      <p className="mt-1 text-xs text-red-250">{errors.phone}</p>
                     )}
                   </div>
                 </div>
@@ -372,7 +401,7 @@ export default function SubscriptionModal({
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-250 focus:ring-offset-2"
                     onClick={handleContinueFromStep2}
                   >
                     Continue to Payment <ArrowRight size={16} />
@@ -394,7 +423,7 @@ export default function SubscriptionModal({
                   Complete Your Payment
                 </h2>
                 <p className="mb-5 text-sm leading-relaxed text-slate-600">
-                  Scan the QR code below using JazzCash to complete your ₨500
+                  Scan the QR code below using JazzCash to complete your ₨250
                   subscription payment.
                 </p>
 
@@ -414,16 +443,16 @@ export default function SubscriptionModal({
                     JazzCash Payment
                   </div>
                   <p className="mb-3 text-xs text-slate-600">
-                    Scan this QR code using your JazzCash app and pay ₨500.
+                    Scan this QR code using your JazzCash app and pay ₨250.
                   </p>
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-500">Amount</span>
-                      <strong className="font-semibold text-slate-900">₨500</strong>
+                      <span className="text-slate-250">Amount</span>
+                      <strong className="font-semibold text-slate-900">₨250</strong>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-500">JazzCash Number</span>
+                      <span className="text-slate-250">JazzCash Number</span>
                       <strong className="font-semibold text-slate-900">
                         03XX XXXXXXX
                       </strong>
@@ -432,7 +461,7 @@ export default function SubscriptionModal({
 
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-amber-700">
                     <ShieldCheck size={13} />
-                    Please make sure you pay exactly ₨500.
+                    Please make sure you pay exactly ₨250.
                   </p>
                 </div>
 
@@ -444,11 +473,21 @@ export default function SubscriptionModal({
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onClick={handlePaymentCompleteClick}
-                  >
-                    I've Completed Payment
-                  </button>
+  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+  onClick={handlePaymentCompleteClick}
+  disabled={loading}
+>
+  {loading ? (
+    <>
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+      Verifying Payment...
+    </>
+  ) : (
+    <>
+      I've Completed Payment
+    </>
+  )}
+</button>
                 </div>
               </>
             )}

@@ -44,12 +44,15 @@ const companyData: CompanyData = {
 const MASK = '••••••••••••••••'
 const DETAILS_MASK = '••••••••••••••••••••••••••••••••'
 
-export default function CompanyInformation() {
-  const [unlocked, setUnlocked] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+type Props = {
+  unlocked?: boolean
+}
+
+export default function CompanyInformation({ unlocked = false }: Props) {
+   const [modalOpen, setModalOpen] = useState(false)
 
   const handleSubscribe = () => {
-    setUnlocked(true)
+  
     setModalOpen(false)
   }
 
