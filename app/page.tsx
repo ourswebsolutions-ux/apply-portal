@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import CompanyInformation from '../components/CompanyInformation'
-
+import SubscriptionModal from '../components/SubscriptionModal'
 type FileState = { name: string; size: string } | null
 
 const initialSkills = ['React', 'Next.js', 'Node.js', 'TypeScript']
@@ -77,6 +77,14 @@ export default function Page() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [unlocked, setUnlocked] = useState(false)
+
+
+  const handleSubscribe = () => {
+    setUnlocked(true)
+    setModalOpen(false)
+  }
 
   const selectFile = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0]
@@ -391,7 +399,7 @@ export default function Page() {
                     <strong>
                       ₨ 250<small>one-time</small>
                     </strong>
-                    <button type="button" onClick={() => setBoostOpen(true)}>
+                    <button type="button" onClick={() => setModalOpen(true)}>
                       Boost my CV <ArrowRight />
                     </button>
                     <button
@@ -440,68 +448,11 @@ export default function Page() {
 
       <Footer />
 
-      {boostOpen && (
-        <div
-          className="modal-backdrop"
-          role="presentation"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setBoostOpen(false)
-          }}
-        >
-          <section
-            className="boost-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="boost-title"
-          >
-            <button className="modal-close" onClick={() => setBoostOpen(false)} aria-label="Close">
-              <X />
-            </button>
-            <div className="modal-rocket">
-              <Rocket />
-            </div>
-            <span className="eyebrow">OPTIONAL PREMIUM SERVICE</span>
-            <h2 id="boost-title">Boost your CV</h2>
-            <p>
-              Get your CV reviewed against this specific opportunity and improve how your most
-              relevant skills and experience are presented.
-            </p>
-            <ul className="modal-benefits">
-              <li>
-                <Check /> Position-specific CV optimization
-              </li>
-              <li>
-                <Check /> Highlight relevant skills
-              </li>
-              <li>
-                <Check /> Improve professional presentation
-              </li>
-              <li>
-                <Check /> AI-assisted recommendations
-              </li>
-            </ul>
-            <div className="modal-price">
-              <span>One-time service</span>
-              <strong>₨500</strong>
-            </div>
-            <p className="whatsapp">
-              Payment / Contact: <b>+92 324 5237429</b>
-            </p>
-            <button
-              className="submit-button"
-              onClick={() => {
-                setBoostRequested(true)
-                setBoostOpen(false)
-              }}
-            >
-              Request CV Boost <ArrowRight />
-            </button>
-            <button className="modal-continue" onClick={() => setBoostOpen(false)}>
-              Continue without boost
-            </button>
-          </section>
-        </div>
-      )}
+      <SubscriptionModal
+              open={modalOpen}
+              onClose={() => setModalOpen(false)}
+              onSubscribe={handleSubscribe}
+            />
     </main>
   )
 }
