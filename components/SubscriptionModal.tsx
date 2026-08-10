@@ -11,6 +11,8 @@ import {
   Mail,
   Phone,
   ShieldCheck,
+  CheckCircle2,
+  Clock,
 } from 'lucide-react'
 
 type SubscriptionModalProps = {
@@ -36,7 +38,7 @@ export default function SubscriptionModal({
     phone: '',
   })
   const [errors, setErrors] = useState<Partial<FormData>>({})
-  const [paymentNote, setPaymentNote] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   if (!open) return null
 
@@ -44,7 +46,7 @@ export default function SubscriptionModal({
     setStep(1)
     setFormData({ fullName: '', email: '', phone: '' })
     setErrors({})
-    setPaymentNote(false)
+    setShowSuccess(false)
     onClose()
   }
 
@@ -68,12 +70,12 @@ export default function SubscriptionModal({
   }
 
   const handleBack = () => {
-    setPaymentNote(false)
+    setShowSuccess(false)
     setStep((prev) => Math.max(1, prev - 1))
   }
 
   const handlePaymentCompleteClick = () => {
-    setPaymentNote(true)
+    setShowSuccess(true)
   }
 
   const updateField = (field: keyof FormData, value: string) => {
@@ -106,321 +108,350 @@ export default function SubscriptionModal({
           <X size={18} />
         </button>
 
-        {/* Step Indicator */}
-        <div className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500">
-          <span
-            className={`flex items-center gap-1.5 ${
-              step === 1 ? 'font-semibold text-indigo-600' : ''
-            }`}
-          >
-            <span
-              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
-                step === 1
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-200 text-slate-600'
-              }`}
-            >
-              1
-            </span>
-            Details
-          </span>
-          <span className="text-slate-300">→</span>
-          <span
-            className={`flex items-center gap-1.5 ${
-              step === 2 ? 'font-semibold text-indigo-600' : ''
-            }`}
-          >
-            <span
-              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
-                step === 2
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-200 text-slate-600'
-              }`}
-            >
-              2
-            </span>
-            Information
-          </span>
-          <span className="text-slate-300">→</span>
-          <span
-            className={`flex items-center gap-1.5 ${
-              step === 3 ? 'font-semibold text-indigo-600' : ''
-            }`}
-          >
-            <span
-              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
-                step === 3
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-200 text-slate-600'
-              }`}
-            >
-              3
-            </span>
-            Payment
-          </span>
-        </div>
+        {/* Success Screen */}
+        {showSuccess ? (
+          <div className="flex flex-col items-center py-6 text-center">
+            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <CheckCircle2 size={36} className="text-emerald-600" strokeWidth={2} />
+            </div>
 
-        {/* STEP 1 — Premium Access */}
-        {step === 1 && (
-          <>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
-              Premium Access
-            </span>
-            <h2
-              id="subscription-title"
-              className="mb-2 text-xl font-bold text-slate-900"
-            >
-              Unlock Company Information
+            <h2 className="mb-2 text-xl font-bold text-slate-900">
+              Payment Submitted!
             </h2>
-            <p className="mb-5 text-sm leading-relaxed text-slate-600">
-              Get access to verified company and recruiter details for this job
-              opportunity.
+
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-slate-600">
+              Thank you. We have received your payment request.
             </p>
 
-            <ul className="mb-6 space-y-2.5">
-              {[
-                'Company information',
-                'Company website',
-                'HR / recruiter name',
-                'HR email',
-                'HR phone number',
-                'Recruitment contact details',
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2.5 text-sm text-slate-700"
-                >
-                  <Check
-                    size={16}
-                    className="shrink-0 text-emerald-500"
-                    strokeWidth={2.5}
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
-              <span className="text-xs font-medium text-slate-500">
-                Subscription
-              </span>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <strong className="text-2xl font-bold text-slate-900">
-                  ₨ 500
-                </strong>
-                <span className="text-sm text-slate-500">/ month</span>
+            <div className="mb-6 w-full rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+              <div className="mb-1 flex items-center justify-center gap-2 text-sm font-semibold text-indigo-700">
+                <Clock size={16} />
+                Account Activation
               </div>
-              <p className="mt-1 text-xs text-slate-500">
-                Cancel anytime · Instant access after subscribe
+              <p className="text-sm text-indigo-800">
+                Your account will be activated within{' '}
+                <strong>1 hour</strong> after payment verification.
               </p>
             </div>
 
+            <p className="mb-6 text-xs text-slate-500">
+              You will receive a confirmation once your premium access is live.
+            </p>
+
             <button
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={handleContinueFromStep1}
-            >
-              Continue to Payment <ArrowRight size={16} />
-            </button>
-            <button
-              className="mt-3 w-full py-2 text-sm font-medium text-slate-500 transition hover:text-slate-700"
+              className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               onClick={resetAndClose}
             >
-              Maybe Later
+              Got it
             </button>
-          </>
-        )}
-
-        {/* STEP 2 — Customer Information */}
-        {step === 2 && (
+          </div>
+        ) : (
           <>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
-              Payment Information
-            </span>
-            <h2
-              id="subscription-title"
-              className="mb-2 text-xl font-bold text-slate-900"
-            >
-              Payment Information
-            </h2>
-            <p className="mb-5 text-sm leading-relaxed text-slate-600">
-              Enter your information before continuing to payment.
-            </p>
-
-            <div className="mb-6 space-y-4">
-              {/* Full Name */}
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
-                >
-                  <User size={15} className="text-slate-400" />
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={formData.fullName}
-                  onChange={(e) => updateField('fullName', e.target.value)}
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
-                    errors.fullName
-                      ? 'border-red-400 focus:border-red-400'
-                      : 'border-slate-200 focus:border-indigo-500'
-                  }`}
-                />
-                {errors.fullName && (
-                  <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
-                >
-                  <Mail size={15} className="text-slate-400" />
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={(e) => updateField('email', e.target.value)}
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
-                    errors.email
-                      ? 'border-red-400 focus:border-red-400'
-                      : 'border-slate-200 focus:border-indigo-500'
-                  }`}
-                />
-                {errors.email && (
-                  <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
-                >
-                  <Phone size={15} className="text-slate-400" />
-                  WhatsApp / Phone Number
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  placeholder="+92 3XX XXXXXXX"
-                  value={formData.phone}
-                  onChange={(e) => updateField('phone', e.target.value)}
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
-                    errors.phone
-                      ? 'border-red-400 focus:border-red-400'
-                      : 'border-slate-200 focus:border-indigo-500'
-                  }`}
-                />
-                {errors.phone && (
-                  <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                onClick={handleBack}
+            {/* Step Indicator */}
+            <div className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500">
+              <span
+                className={`flex items-center gap-1.5 ${
+                  step === 1 ? 'font-semibold text-indigo-600' : ''
+                }`}
               >
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={handleContinueFromStep2}
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    step === 1
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  1
+                </span>
+                Details
+              </span>
+              <span className="text-slate-300">→</span>
+              <span
+                className={`flex items-center gap-1.5 ${
+                  step === 2 ? 'font-semibold text-indigo-600' : ''
+                }`}
               >
-                Continue to Payment <ArrowRight size={16} />
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* STEP 3 — JazzCash QR Payment */}
-        {step === 3 && (
-          <>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
-              Complete Payment
-            </span>
-            <h2
-              id="subscription-title"
-              className="mb-2 text-xl font-bold text-slate-900"
-            >
-              Complete Your Payment
-            </h2>
-            <p className="mb-5 text-sm leading-relaxed text-slate-600">
-              Scan the QR code below using JazzCash to complete your ₨500
-              subscription payment.
-            </p>
-
-            {/* QR Code */}
-            <div className="mb-5 flex flex-col items-center">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <img
-                  src="/qr.jpeg"
-                  alt="JazzCash QR Code"
-                  className="h-48 w-48 object-contain"
-                />
-              </div>
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    step === 2
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  2
+                </span>
+                Information
+              </span>
+              <span className="text-slate-300">→</span>
+              <span
+                className={`flex items-center gap-1.5 ${
+                  step === 3 ? 'font-semibold text-indigo-600' : ''
+                }`}
+              >
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    step === 3
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  3
+                </span>
+                Payment
+              </span>
             </div>
 
-            {/* Payment details */}
-            <div className="mb-5 rounded-xl border border-slate-100 bg-slate-50 p-4">
-              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
-                <QrCode size={16} className="text-indigo-600" />
-                JazzCash Payment
-              </div>
-              <p className="mb-3 text-xs text-slate-600">
-                Scan this QR code using your JazzCash app and pay ₨500.
-              </p>
+            {/* STEP 1 — Premium Access */}
+            {step === 1 && (
+              <>
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  Premium Access
+                </span>
+                <h2
+                  id="subscription-title"
+                  className="mb-2 text-xl font-bold text-slate-900"
+                >
+                  Unlock Company Information
+                </h2>
+                <p className="mb-5 text-sm leading-relaxed text-slate-600">
+                  Get access to verified company and recruiter details for this job
+                  opportunity.
+                </p>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Amount</span>
-                  <strong className="font-semibold text-slate-900">₨500</strong>
+                <ul className="mb-6 space-y-2.5">
+                  {[
+                    'Company information',
+                    'Company website',
+                    'HR / recruiter name',
+                    'HR email',
+                    'HR phone number',
+                    'Recruitment contact details',
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2.5 text-sm text-slate-700"
+                    >
+                      <Check
+                        size={16}
+                        className="shrink-0 text-emerald-500"
+                        strokeWidth={2.5}
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <span className="text-xs font-medium text-slate-500">
+                    Subscription
+                  </span>
+                  <div className="mt-1 flex items-baseline gap-1.5">
+                    <strong className="text-2xl font-bold text-slate-900">
+                      ₨ 500
+                    </strong>
+                    <span className="text-sm text-slate-500">/ month</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Cancel anytime · Instant access after subscribe
+                  </p>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">JazzCash Number</span>
-                  <strong className="font-semibold text-slate-900">
-                    03XX XXXXXXX
-                  </strong>
-                </div>
-              </div>
 
-              <p className="mt-3 flex items-center gap-1.5 text-xs text-amber-700">
-                <ShieldCheck size={13} />
-                Please make sure you pay exactly ₨500.
-              </p>
-            </div>
-
-            {paymentNote && (
-              <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
-                Payment verification will be added soon.
-              </div>
+                <button
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  onClick={handleContinueFromStep1}
+                >
+                  Continue to Payment <ArrowRight size={16} />
+                </button>
+                <button
+                  className="mt-3 w-full py-2 text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                  onClick={resetAndClose}
+                >
+                  Maybe Later
+                </button>
+              </>
             )}
 
-            <div className="flex gap-3">
-              <button
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                onClick={handleBack}
-              >
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={handlePaymentCompleteClick}
-                disabled={paymentNote}
-              >
-                I've Completed Payment
-              </button>
-            </div>
+            {/* STEP 2 — Customer Information */}
+            {step === 2 && (
+              <>
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  Payment Information
+                </span>
+                <h2
+                  id="subscription-title"
+                  className="mb-2 text-xl font-bold text-slate-900"
+                >
+                  Payment Information
+                </h2>
+                <p className="mb-5 text-sm leading-relaxed text-slate-600">
+                  Enter your information before continuing to payment.
+                </p>
+
+                <div className="mb-6 space-y-4">
+                  <div>
+                    <label
+                      htmlFor="fullName"
+                      className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
+                    >
+                      <User size={15} className="text-slate-400" />
+                      Full Name
+                    </label>
+                    <input
+                      id="fullName"
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={formData.fullName}
+                      onChange={(e) => updateField('fullName', e.target.value)}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                        errors.fullName
+                          ? 'border-red-400 focus:border-red-400'
+                          : 'border-slate-200 focus:border-indigo-500'
+                      }`}
+                    />
+                    {errors.fullName && (
+                      <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
+                    >
+                      <Mail size={15} className="text-slate-400" />
+                      Email Address
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={(e) => updateField('email', e.target.value)}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                        errors.email
+                          ? 'border-red-400 focus:border-red-400'
+                          : 'border-slate-200 focus:border-indigo-500'
+                      }`}
+                    />
+                    {errors.email && (
+                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="phone"
+                      className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
+                    >
+                      <Phone size={15} className="text-slate-400" />
+                      WhatsApp / Phone Number
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="+92 3XX XXXXXXX"
+                      value={formData.phone}
+                      onChange={(e) => updateField('phone', e.target.value)}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500/20 ${
+                        errors.phone
+                          ? 'border-red-400 focus:border-red-400'
+                          : 'border-slate-200 focus:border-indigo-500'
+                      }`}
+                    />
+                    {errors.phone && (
+                      <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                    onClick={handleBack}
+                  >
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={handleContinueFromStep2}
+                  >
+                    Continue to Payment <ArrowRight size={16} />
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* STEP 3 — JazzCash QR Payment */}
+            {step === 3 && (
+              <>
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  Complete Payment
+                </span>
+                <h2
+                  id="subscription-title"
+                  className="mb-2 text-xl font-bold text-slate-900"
+                >
+                  Complete Your Payment
+                </h2>
+                <p className="mb-5 text-sm leading-relaxed text-slate-600">
+                  Scan the QR code below using JazzCash to complete your ₨500
+                  subscription payment.
+                </p>
+
+                <div className="mb-5 flex flex-col items-center">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <img
+                      src="/jazzcash-qr.png"
+                      alt="JazzCash QR Code"
+                      className="h-48 w-48 object-contain"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-5 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <QrCode size={16} className="text-indigo-600" />
+                    JazzCash Payment
+                  </div>
+                  <p className="mb-3 text-xs text-slate-600">
+                    Scan this QR code using your JazzCash app and pay ₨500.
+                  </p>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-500">Amount</span>
+                      <strong className="font-semibold text-slate-900">₨500</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-500">JazzCash Number</span>
+                      <strong className="font-semibold text-slate-900">
+                        03XX XXXXXXX
+                      </strong>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-amber-700">
+                    <ShieldCheck size={13} />
+                    Please make sure you pay exactly ₨500.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                    onClick={handleBack}
+                  >
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={handlePaymentCompleteClick}
+                  >
+                    I've Completed Payment
+                  </button>
+                </div>
+              </>
+            )}
           </>
         )}
       </section>
