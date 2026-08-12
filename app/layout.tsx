@@ -44,6 +44,26 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background">
       <body className={`${inter.variable} antialiased`}>
+          <header className="site-header mx-auto flex w-[96%] max-w-[1400px] items-center justify-between px-7 py-5">
+        <div className="brand lg:-ml-20">
+          <img
+            src="/logo.png"
+            alt="Axora Web Solutions"
+            className="h-auto w-[190px] object-contain"
+          />
+        </div>
+
+        <span className="help-link text-sm">
+          Need Help?{' '}
+          <a
+            href="mailto:hello@axorawebsolutions.com"
+            className="font-medium hover:underline"
+          >
+            Contact us
+          </a>
+        </span>
+      </header>
+
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

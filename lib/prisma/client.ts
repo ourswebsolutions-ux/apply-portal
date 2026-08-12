@@ -46,3 +46,8 @@ export { Prisma }
  * 
  */
 export type PaidEmail = Prisma.PaidEmailModel
+/**
+ * Model Employee
+ * 
+ */
+export type Employee = Prisma.EmployeeModel

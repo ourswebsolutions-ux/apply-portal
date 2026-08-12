@@ -51,7 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  PaidEmail: 'PaidEmail'
+  PaidEmail: 'PaidEmail',
+  Employee: 'Employee'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -80,6 +81,49 @@ export const PaidEmailScalarFieldEnum = {
 export type PaidEmailScalarFieldEnum = (typeof PaidEmailScalarFieldEnum)[keyof typeof PaidEmailScalarFieldEnum]
 
 
+export const EmployeeScalarFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  email: 'email',
+  phone: 'phone',
+  country: 'country',
+  jobTitle: 'jobTitle',
+  experience: 'experience',
+  skills: 'skills',
+  expectedSalary: 'expectedSalary',
+  linkedin: 'linkedin',
+  github: 'github',
+  portfolio: 'portfolio',
+  cvUrl: 'cvUrl',
+  cvFileName: 'cvFileName',
+  jobPosition: 'jobPosition',
+  premiumAccess: 'premiumAccess',
+  boostRequested: 'boostRequested',
+  quickReplySent: 'quickReplySent',
+  quickReplySentAt: 'quickReplySentAt',
+  interviewInviteSent: 'interviewInviteSent',
+  interviewInviteSentAt: 'interviewInviteSentAt',
+  candidateReplied: 'candidateReplied',
+  candidateRepliedAt: 'candidateRepliedAt',
+  candidateReply: 'candidateReply',
+  interviewToken: 'interviewToken',
+  interviewPaid: 'interviewPaid',
+  interviewPaidAt: 'interviewPaidAt',
+  interviewStatus: 'interviewStatus',
+  interviewStartedAt: 'interviewStartedAt',
+  interviewEndedAt: 'interviewEndedAt',
+  interviewQuestions: 'interviewQuestions',
+  interviewAnswers: 'interviewAnswers',
+  interviewScore: 'interviewScore',
+  interviewFeedback: 'interviewFeedback',
+  slug: 'slug',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -88,10 +132,68 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const PaidEmailOrderByRelevanceFieldEnum = {
   id: 'id',
   email: 'email'
 } as const
 
 export type PaidEmailOrderByRelevanceFieldEnum = (typeof PaidEmailOrderByRelevanceFieldEnum)[keyof typeof PaidEmailOrderByRelevanceFieldEnum]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const EmployeeOrderByRelevanceFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  email: 'email',
+  phone: 'phone',
+  country: 'country',
+  jobTitle: 'jobTitle',
+  experience: 'experience',
+  expectedSalary: 'expectedSalary',
+  linkedin: 'linkedin',
+  github: 'github',
+  portfolio: 'portfolio',
+  cvUrl: 'cvUrl',
+  cvFileName: 'cvFileName',
+  jobPosition: 'jobPosition',
+  candidateReply: 'candidateReply',
+  interviewToken: 'interviewToken',
+  interviewStatus: 'interviewStatus',
+  interviewFeedback: 'interviewFeedback',
+  slug: 'slug'
+} as const
+
+export type EmployeeOrderByRelevanceFieldEnum = (typeof EmployeeOrderByRelevanceFieldEnum)[keyof typeof EmployeeOrderByRelevanceFieldEnum]
 

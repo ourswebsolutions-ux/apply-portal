@@ -15,3 +15,65 @@ model PaidEmail {
 
   @@index([email])
 } 
+
+model Employee {
+  id              String   @id @default(cuid())
+
+  fullName        String
+  email           String   @unique
+  phone           String
+  country         String
+
+  jobTitle        String?
+  experience      String?
+  skills          Json?
+  expectedSalary  String?
+
+  linkedin        String?
+  github          String?
+  portfolio       String?
+
+  cvUrl           String?
+  cvFileName      String?
+  jobPosition     String?
+
+  premiumAccess   Boolean  @default(false)
+  boostRequested  Boolean  @default(false)
+
+  // Quick reply tracking
+  quickReplySent      Boolean  @default(false)
+  quickReplySentAt    DateTime?
+
+  // Interview invitation tracking
+  interviewInviteSent   Boolean  @default(false)
+  interviewInviteSentAt DateTime?
+
+  // Candidate/job reply tracking
+  candidateReplied     Boolean  @default(false)
+  candidateRepliedAt   DateTime?
+  candidateReply       String?   @db.Text
+
+  // Interview
+  interviewToken      String?   @unique
+  interviewPaid       Boolean   @default(false)
+  interviewPaidAt     DateTime?
+  interviewStatus     String    @default("pending")
+  interviewStartedAt  DateTime?
+  interviewEndedAt    DateTime?
+
+  interviewQuestions  Json?
+  interviewAnswers    Json?
+  interviewScore      Int?
+  interviewFeedback   String?   @db.Text
+ slug               String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([jobPosition])
+  @@index([interviewStatus])
+  @@index([quickReplySent])
+  @@index([interviewInviteSent])
+  @@index([candidateReplied])
+  @@index([createdAt])
+}

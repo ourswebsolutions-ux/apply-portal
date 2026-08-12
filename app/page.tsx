@@ -15,10 +15,11 @@ import {
   Rocket,
   UploadCloud,
   X,
+  Home
 } from 'lucide-react'
 import CompanyInformation from '../components/CompanyInformation'
 import SubscriptionModal from '../components/SubscriptionModal'
-import DynamicAd from '../components/DynamicAd'; // adjust the path if needed
+import DynamicAd from '../components/DynamicAd' // adjust the path if needed
 
 type FileState = { name: string; size: string } | null
 
@@ -110,6 +111,17 @@ export default function Page() {
   const [checkingEmail, setCheckingEmail] = useState(false)
   const [emailCheckError, setEmailCheckError] = useState(false)
 
+  // Form fields
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [country, setCountry] = useState('')
+  const [currentJobTitle, setCurrentJobTitle] = useState('')
+  const [experience, setExperience] = useState('')
+  const [expectedSalary, setExpectedSalary] = useState('')
+  const [linkedin, setLinkedin] = useState('')
+  const [github, setGithub] = useState('')
+  const [portfolio, setPortfolio] = useState('')
+
   const hasPremiumAccess = paidAccess || boostRequested
 
   // Keep job title in sync with the URL hash (including live changes)
@@ -179,87 +191,139 @@ export default function Page() {
     setSkillInput('')
   }
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault()
-    if (!file) return setError('Please upload your CV before submitting.')
-    if (!consent)
-      return setError('Please confirm that the information provided is accurate.')
     setError('')
+
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !country.trim()) {
+      return setError('Full name, email, phone and country are required.')
+    }
+    if (!file) {
+      return setError('Please upload your CV before submitting.')
+    }
+    if (!consent) {
+      return setError('Please confirm that the information provided is accurate.')
+    }
+
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+
+    try {
+      // Optional: Upload CV first if you have an /api/upload route
+      // Uncomment and adjust if needed
+      /*
+      let cvUrl: string | null = null
+      let cvFileName: string | null = null
+
+      if (fileInput.current?.files?.[0]) {
+        const formData = new FormData()
+        formData.append('file', fileInput.current.files[0])
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (!uploadRes.ok) {
+          throw new Error('Failed to upload CV')
+        }
+
+        const uploadData = await uploadRes.json()
+        cvUrl = uploadData.url
+        cvFileName = uploadData.fileName || file.name
+      }
+      */
+
+      // For now we send the filename. Replace with real upload logic above when ready.
+      const cvUrl = null
+      const cvFileName = file.name
+
+      const res = await fetch('/api/employee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          country: country.trim(),
+          jobTitle: currentJobTitle.trim() || null,
+          experience: experience || null,
+          skills,
+          expectedSalary: expectedSalary.trim() || null,
+          linkedin: linkedin.trim() || null,
+          github: github.trim() || null,
+          portfolio: portfolio.trim() || null,
+          cvUrl,
+          cvFileName,
+          jobPosition: jobTitle,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to submit application')
+      }
+
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 900)
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
-    return (
-      <main className="site-shell success-shell">
-        <header className="site-header">
-          <div className="brand">
-            <span className="brand-mark">A</span>
-            <span>
-              AXORA <b>WEB SOLUTIONS</b>
-            </span>
+  return (
+    <main className="site-shell success-shell">
+   
+      <section className="success-card" aria-live="polite">
+        <div className="success-icon">
+          <Check />
+        </div>
+        <span className="eyebrow">APPLICATION RECEIVED</span>
+        <h1>Application submitted</h1>
+        <p>
+          Your application has been successfully received and will be reviewed
+          by our recruitment team.
+        </p>
+        <div className="success-details">
+          <div>
+            <span>POSITION</span>
+            <strong>{jobTitle}</strong>
           </div>
-          <span className="help-link">
-            Need Help? <a href="mailto:info.axoraweb@gmail.com">Contact us</a>
-          </span>
-        </header>
-        <section className="success-card" aria-live="polite">
-          <div className="success-icon">
-            <Check />
+          <div>
+            <span>APPLICATION REFERENCE</span>
+            <strong>AXR-2026-000124</strong>
           </div>
-          <span className="eyebrow">APPLICATION RECEIVED</span>
-          <h1>Application submitted</h1>
-          <p>
-            Your application has been successfully received and will be reviewed
-            by our recruitment team.
-          </p>
-          <div className="success-details">
-            <div>
-              <span>POSITION</span>
-              <strong>{jobTitle}</strong>
-            </div>
-            <div>
-              <span>APPLICATION REFERENCE</span>
-              <strong>AXR-2026-000124</strong>
-            </div>
-          </div>
-          <div className="success-status">
-            <CheckCircle2 />{' '}
-            {hasPremiumAccess ? 'CV Boost Requested' : 'Application Submitted'}
-          </div>
-          <p className="thank-you">Thank you for your interest in Axora.</p>
-        </section>
-        <Footer />
-      </main>
-    )
-  }
+        </div>
+        <div className="success-status">
+          <CheckCircle2 />{' '}
+          {hasPremiumAccess ? 'CV Boost Requested' : 'Application Submitted'}
+        </div>
+        {/* <p className="thank-you">Thank you for your interest in Axora.</p> */}
+
+        {/* Go Home button */}
+        
+        <a href="/" className="go-home-button mt-4">
+         <button
+                  
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-purple-400 hover:bg-purple-700 active:bg-indigo-800 text-white font-medium py-3.5 px-5 transition-colors shadow-sm shadow-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                >
+                  <Home className="w-4 h-4" />
+                  Back to Home
+                </button>
+        </a>
+      </section>
+      <Footer />
+    </main>
+  )
+}
 
   return (
     <main className="site-shell">
-      <header className="site-header mx-auto flex w-[96%] max-w-[1400px] items-center justify-between px-7 py-5">
-        <div className="brand lg:-ml-20">
-          <img
-            src="/logo.png"
-            alt="Axora Web Solutions"
-            className="h-auto w-[190px] object-contain"
-          />
-        </div>
-
-        <span className="help-link text-sm">
-          Need Help?{' '}
-          <a
-            href="mailto:hello@axorawebsolutions.com"
-            className="font-medium hover:underline"
-          >
-            Contact us
-          </a>
-        </span>
-      </header>
-
       <section className="application-intro">
         <span className="eyebrow">APPLICATION</span>
         <h1>
@@ -283,7 +347,13 @@ export default function Page() {
               <SectionHeading number="01" title="Personal information" />
               <div className="field-grid">
                 <Field label="Full Name" required>
-                  <input name="name" placeholder="John Doe" autoComplete="name" />
+                  <input
+                    name="name"
+                    placeholder="John Doe"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
                 </Field>
 
                 <Field label="Email Address" required>
@@ -324,6 +394,8 @@ export default function Page() {
                     name="phone"
                     placeholder="+92 3XX XXXXXXX"
                     autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                 </Field>
                 <Field label="Country" required>
@@ -333,30 +405,37 @@ export default function Page() {
                       name="country"
                       placeholder="Pakistan"
                       autoComplete="country-name"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
                     />
                   </div>
                 </Field>
               </div>
             </div>
 
-            {/* … sections 02, 03, 04 remain exactly as you had them … */}
-
             <div className="form-section">
               <SectionHeading number="02" title="Professional information" />
               <div className="field-grid">
                 <Field label="Current Job Title">
-                  <input placeholder="e.g. Software Engineer" />
+                  <input
+                    placeholder="e.g. Software Engineer"
+                    value={currentJobTitle}
+                    onChange={(e) => setCurrentJobTitle(e.target.value)}
+                  />
                 </Field>
                 <Field label="Years of Experience" required>
                   <div className="select-wrap">
-                    <select defaultValue="">
+                    <select
+                      value={experience}
+                      onChange={(e) => setExperience(e.target.value)}
+                    >
                       <option value="" disabled>
                         Select experience
                       </option>
-                      <option>0–2 years</option>
-                      <option>3–5 years</option>
-                      <option>6–10 years</option>
-                      <option>10+ years</option>
+                      <option value="0–2 years">0–2 years</option>
+                      <option value="3–5 years">3–5 years</option>
+                      <option value="6–10 years">6–10 years</option>
+                      <option value="10+ years">10+ years</option>
                     </select>
                     <ChevronDown />
                   </div>
@@ -403,7 +482,11 @@ export default function Page() {
                   </div>
                 </Field>
                 <Field label="Expected Salary">
-                  <input placeholder="e.g. ₨300,000 / month" />
+                  <input
+                    placeholder="e.g. ₨300,000 / month"
+                    value={expectedSalary}
+                    onChange={(e) => setExpectedSalary(e.target.value)}
+                  />
                 </Field>
               </div>
             </div>
@@ -418,19 +501,31 @@ export default function Page() {
                 <Field label="LinkedIn Profile" optional>
                   <div className="input-icon">
                     <Link2 />
-                    <input placeholder="linkedin.com/in/yourname" />
+                    <input
+                      placeholder="linkedin.com/in/yourname"
+                      value={linkedin}
+                      onChange={(e) => setLinkedin(e.target.value)}
+                    />
                   </div>
                 </Field>
                 <Field label="GitHub" optional>
                   <div className="input-icon">
                     <Link2 />
-                    <input placeholder="github.com/yourname" />
+                    <input
+                      placeholder="github.com/yourname"
+                      value={github}
+                      onChange={(e) => setGithub(e.target.value)}
+                    />
                   </div>
                 </Field>
                 <Field label="Portfolio / Website" optional>
                   <div className="input-icon">
                     <Link2 />
-                    <input placeholder="yourwebsite.com" />
+                    <input
+                      placeholder="yourwebsite.com"
+                      value={portfolio}
+                      onChange={(e) => setPortfolio(e.target.value)}
+                    />
                   </div>
                 </Field>
               </div>
