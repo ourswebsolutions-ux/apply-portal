@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 import { prisma } from '@/lib/prisma'
 import nodemailer from 'nodemailer'
 import { logger } from '@/lib/logger' // adjust path if your logger lives elsewhere
